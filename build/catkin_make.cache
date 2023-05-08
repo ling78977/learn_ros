@@ -1,0 +1,2 @@
+first_pkg:guangdian_car_gazebo:guangdian_car_urdf:head_src:migong:my_pakage:param:rplidar_ros:serve:start:test:tf2_static:tf2_turtle:tfs
+-DCATKIN_DEVEL_PREFIX=/home/ling/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/ling/catkin_ws/install -G Unix Makefiles

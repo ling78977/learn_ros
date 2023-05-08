@@ -1,0 +1,188 @@
+<!--
+    使用 xacro 优化 URDF 版的小车底盘实现：
+
+    实现思路:
+    1.将一些常量、变量封装为 xacro:property
+      比如:PI 值、小车底盘半径、离地间距、车轮半径、宽度 ....
+    2.使用 宏 封装驱动轮以及支撑轮实现，调用相关宏生成驱动轮与支撑轮
+
+-->
+<!-- 根标签，必须声明 xmlns:xacro -->
+<robot name="my_base" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- 封装变量、常量 -->
+    <xacro:property name="PI" value="3.141"/>
+    <!-- 宏:黑色设置 -->
+    <material name="black">
+        <color rgba="0.0 0.0 0.0 1.0" />
+    </material>
+    <!-- 底盘属性 -->
+    <xacro:property name="base_footprint_radius" value="0.06" /> <!-- base_footprint 半径  -->
+    <xacro:property name="base_link_length" value="0.3" /> <!-- base_link 长 -->
+    <xacro:property name="base_link_width" value="0.2" /> <!-- base_link 宽 -->
+    <xacro:property name="base_link_height" value="0.02" /> <!-- base_link 高 -->
+    <xacro:property name="earth_space" value="0.06" /> <!-- 离地间距 -->
+    <xacro:property name="base_link_m" value="0.2" /> <!-- 质量  -->
+
+
+    <!-- 底盘 -->
+    <link name="base_footprint">
+      <visual>
+        <geometry>
+          <sphere radius="${base_footprint_radius}" />
+        </geometry>
+        <material name="yellow">
+          <color rgba="0.0 0.0 0.0 0" />
+        </material>
+      </visual>
+    </link>
+
+    <link name="base_link">
+      <visual>
+        <geometry>
+        <!--长宽高 -->
+        <box size="${base_link_length} ${base_link_width} ${base_link_height}"/>
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <material name="yellow">
+          <color rgba="0.5 0.3 0.0 0.5" />
+        </material>
+      </visual>
+
+      <collision>
+        <geometry>
+          <box size="${base_link_length} ${base_link_width} ${base_link_height}"/>
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </collision>
+      
+       <xacro:Box_inertial_matrix m="${base_link_m}" l="${base_link_length}" w="${base_link_width}" h="${base_link_height}"/>
+    </link>
+
+    <joint name="base_link2base_footprint" type="fixed">
+      <parent link="base_footprint" />
+      <child link="base_link" />
+      <origin xyz="0 0 ${base_footprint_radius + base_link_height / 2 }" />
+    </joint>
+     <gazebo reference="base_link">
+        <material>Gazebo/Yellow</material>
+    </gazebo>
+
+    <!-- 轴承 -->
+    <!-- 属性 -->
+    <xacro:property name="zhou_radius" value="0.02" /><!-- 半径 -->
+    <xacro:property name="zhou_length" value="${base_link_width}" /><!-- 长度 -->
+    <xacro:property name="zhou_m" value="0.2" /> <!-- 质量  -->
+    <!-- 轴宏实现 -->
+    <xacro:macro name="zhou" params="name flag">
+      <link name="${name}_zhou_link">
+        <visual>
+          <geometry>
+            <cylinder radius="${zhou_radius}" length="${zhou_length}" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0" rpy="${PI / 2} 0.0 0.0" />
+          <material name="black" />
+        </visual>
+
+        <collision>
+          <geometry>
+            <cylinder radius="${zhou_radius}" length="${zhou_length}" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0" rpy="${PI / 2} 0.0 0.0" />
+        </collision>
+
+        <xacro:cylinder_inertial_matrix m="${base_link_m}" r="${zhou_radius}" h="${zhou_length}" />
+      </link>
+    
+    <joint name="${name}_zhou_link2base_link" type="fixed">
+        <parent link="base_link" />
+        <child link="${name}_zhou_link" />
+        <origin xyz="${flag*(base_link_length/2-0.04)} 0 ${-(zhou_radius+base_link_height/2) }" />
+    </joint>
+    <gazebo reference="${name}_zhou_link">
+        <material>Gazebo/Yellow</material>
+    </gazebo>
+
+    </xacro:macro>
+    <xacro:zhou name="forward" flag="1" />
+    <xacro:zhou name="back" flag="-1" />
+
+     <!-- 驱动轮 -->
+    <!-- 驱动轮属性 -->
+    <xacro:property name="wheel_radius" value="0.04" /><!-- 半径 -->
+    <xacro:property name="wheel_length" value="0.04" /><!-- 宽度 -->
+    <xacro:property name="wheel_m" value="0.05" /> <!-- 质量  -->
+    <!-- 前驱动轮宏实现 -->
+    <xacro:macro name="add_wheels" params="name flag_lr1">
+      <link name="${name}_forward_wheel">
+        <visual>
+          <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0" rpy="${PI / 2} 0.0 0.0" />
+          <material name="black" />
+        </visual>
+        <collision>
+          <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0" rpy="${PI / 2} 0.0 0.0" />
+        </collision>
+      
+       <xacro:cylinder_inertial_matrix m="${wheel_m}" r="${wheel_radius}" h="${wheel_length}" />
+      </link>
+
+      <joint name="${name}_forward_wheel2forward_zhou_link" type="continuous">
+        <parent link="forward_zhou_link" />
+        <child link="${name}_forward_wheel" />
+        <origin xyz="0 ${flag_lr1 * (base_link_width/2+wheel_length/2)} 0 " />
+        <axis xyz="0 1 0" />
+      </joint>
+
+
+      <gazebo reference="${name}_forward_wheel">
+        <material>Gazebo/Red</material>
+      </gazebo>
+
+    </xacro:macro>
+    <xacro:add_wheels name="left" flag_lr1="1" />
+    <xacro:add_wheels name="right" flag_lr1="-1" />
+   <!-- 后驱动轮 -->
+   <xacro:macro name="add_wheels" params="name flag_lr2">
+      <link name="${name}_back_wheel">
+        <visual>
+          <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0" rpy="${PI / 2} 0.0 0.0" />
+          <material name="black" />
+        </visual>
+
+        <collision>
+          <geometry>
+            <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0" rpy="${PI / 2} 0.0 0.0" />
+        </collision>
+      
+       <xacro:cylinder_inertial_matrix m="${wheel_m}" r="${wheel_radius}" h="${wheel_length}" />
+
+      </link>
+
+      <joint name="${name}_back_wheel2back_zhou_link" type="continuous">
+        <parent link="back_zhou_link" />
+        <child link="${name}_back_wheel" />
+        <origin xyz="0 ${flag_lr2 * (base_link_width/2+wheel_length/2)} 0 " />
+        <axis xyz="0 1 0" />
+      </joint>
+
+      <gazebo reference="${name}_back_wheel">
+        <material>Gazebo/Red</material>
+      </gazebo>
+
+    </xacro:macro>
+    <xacro:add_wheels name="left" flag_lr2="1" />
+    <xacro:add_wheels name="right" flag_lr2="-1" />
+
+
+</robot>
+

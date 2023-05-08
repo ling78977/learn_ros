@@ -1,0 +1,8 @@
+prefix=/home/ling/catkin_ws/devel
+
+Name: tf2_turtle
+Description: Description of tf2_turtle
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

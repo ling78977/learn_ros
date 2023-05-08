@@ -1,0 +1,8 @@
+prefix=/home/ling/catkin_ws/install
+
+Name: guangdian_car_urdf
+Description: Description of guangdian_car_urdf
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

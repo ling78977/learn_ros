@@ -1,0 +1,8 @@
+prefix=/home/ling/catkin_ws/devel
+
+Name: tfs
+Description: Description of tfs
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

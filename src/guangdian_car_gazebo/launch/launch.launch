@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find guangdian_car_gazebo)/launch/car_gazebo.launch"/>
+    <include file="$(find guangdian_car_gazebo)/launch/car_rviz.launch"/>
+
+</launch>

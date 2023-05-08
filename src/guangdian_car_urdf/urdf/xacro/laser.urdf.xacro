@@ -1,0 +1,129 @@
+<!--
+    小车底盘添加雷达
+-->
+<robot name="laser" xmlns:xacro="http://wiki.ros.org/xacro">
+
+    <!-- 雷达支架 -->
+    <xacro:property name="support_length" value="0.05" /> <!-- 支架长度 -->
+    <xacro:property name="support_radius" value="0.003" /> <!-- 支架半径 -->
+    <xacro:property name="support_x" value="0.05" /> <!-- 支架安装的x坐标 -->
+    <xacro:property name="support_y" value="0.05" /> <!-- 支架安装的y坐标 -->
+    <xacro:property name="support_z" value="${base_link_height / 2 + support_length / 2}" /> <!-- 支架安装的z坐标:底盘高度 / 2 + 支架高度 / 2  -->
+
+    <link name="support1_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${support_radius}" length="${support_length}" />
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <material name="red">
+                <color rgba="0.8 0.2 0.0 0.8" />
+            </material>
+        </visual>
+    </link>
+
+    <joint name="support1_link2base_link" type="fixed">
+        <parent link="base_link" />
+        <child link="support1_link" />
+        <origin xyz="${support_x} ${support_y} ${support_z}" />
+    </joint>
+
+    <link name="support2_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${support_radius}" length="${support_length}" />
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <material name="red">
+                <color rgba="0.8 0.2 0.0 0.8" />
+            </material>
+        </visual>
+    </link>
+
+    <joint name="support2_link2base_link" type="fixed">
+        <parent link="base_link" />
+        <child link="support2_link" />
+        <origin xyz="${support_x} ${-support_y} ${support_z}" />
+    </joint>
+
+    <link name="support3_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${support_radius}" length="${support_length}" />
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <material name="red">
+                <color rgba="0.8 0.2 0.0 0.8" />
+            </material>
+        </visual>
+    </link>
+
+    <joint name="support3_link2base_link" type="fixed">
+        <parent link="base_link" />
+        <child link="support3_link" />
+        <origin xyz="${-support_x} ${support_y} ${support_z}" />
+    </joint>
+
+    <link name="support4_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${support_radius}" length="${support_length}" />
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <material name="red">
+                <color rgba="0.8 0.2 0.0 0.8" />
+            </material>
+        </visual>
+    </link>
+
+    <joint name="support4_link2base_link" type="fixed">
+        <parent link="base_link" />
+        <child link="support4_link" />
+        <origin xyz="${-support_x} ${-support_y} ${support_z}" />
+    </joint>
+    <!-- 放雷达的板子 -->
+    <xacro:property name="board_length" value="0.11" /> <!-- 板子长 -->
+    <xacro:property name="board_width" value="0.11" /> <!-- 板子宽 -->
+    <xacro:property name="board_height" value="0.02" /> <!-- 板子高 -->
+    <link name="board_link">
+        <visual>
+            <geometry>
+                <box size="${board_length} ${board_width} ${board_height}"/>
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <material name="red">
+                <color rgba="0.8 0.2 0.0 0.8" />
+            </material>
+        </visual>
+    </link>
+
+    <joint name="board_link2support1_link" type="fixed">
+        <parent link="support1_link"/>
+        <child link="board_link"/>
+        <origin xyz="${-(board_length/2-support_radius)} ${-(board_width/2-support_radius)} ${support_length/2+board_height/2} " rpy="0.0 0.0 0.0"/>
+    </joint>
+ 
+    <!-- 雷达属性 -->
+    <xacro:property name="laser_length" value="0.03" /> <!-- 雷达长度 -->
+    <xacro:property name="laser_radius" value="0.05" /> <!-- 雷达半径 -->
+    <xacro:property name="laser_x" value="0.0" /> <!-- 雷达安装的x坐标 -->
+    <xacro:property name="laser_y" value="0.0" /> <!-- 雷达安装的y坐标 -->
+    <xacro:property name="laser_z" value="${board_height / 2 + laser_length / 2}" /> <!-- 雷达安装的z坐标:支架高度 / 2 + 雷达高度 / 2  -->
+
+    <!-- 雷达关节以及link -->
+    <link name="laser_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${laser_radius}" length="${laser_length}" />
+            </geometry>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <material name="black" />
+        </visual>
+    </link>
+
+    <joint name="laser_link2board_link" type="fixed">
+        <parent link="board_link" />
+        <child link="laser_link" />
+        <origin xyz="${laser_x} ${laser_y} ${laser_z}" />
+    </joint>
+</robot>
