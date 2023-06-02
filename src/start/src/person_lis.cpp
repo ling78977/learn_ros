@@ -6,6 +6,7 @@
 #include "ros/ros.h"
 #include "start/person.h"
 
+
 void doPerson(const start::person::ConstPtr& person_p){
     ROS_INFO("订阅的人信息:%s, %d, %.2f", person_p->name.c_str(), person_p->age, person_p->height);
 }
