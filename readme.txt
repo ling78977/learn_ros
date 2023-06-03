@@ -1,1 +1,3 @@
-本仓库用于本人学习git和ros相关知识使用
+roslaunch guangdian_car_gazebo car_gazebo.launch
+
+roslaunch guangdian_car_gazebo nav.launch
